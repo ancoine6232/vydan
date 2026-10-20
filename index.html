@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -150,7 +150,7 @@ h1{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
 
 <button id="music"><span class="eq">♪</span><span id="musicTxt">Nhạc nền</span></button>
 <!-- Nhạc nền YouTube (player ẩn) -->
-<div id="yt" style="position:fixed;width:1px;height:1px;left:-10px;top:-10px;opacity:0;pointer-events:none"></div>
+<div style="position:fixed;left:0;bottom:0;width:200px;height:200px;overflow:hidden;opacity:0;pointer-events:none;z-index:-1" aria-hidden="true"><div id="yt"></div></div>
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
@@ -195,7 +195,7 @@ const YT_ID = 'aGJVnbQEf3c';
 let yt = null, ytReady = false, ytOn = false, wantPlay = false;
 window.onYouTubeIframeAPIReady = () => {
   yt = new YT.Player('yt', {
-    width: 1, height: 1, videoId: YT_ID,
+    width: 200, height: 200, videoId: YT_ID,
     playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1 },
     events: { onReady: () => { ytReady = true; yt.setVolume(70); if (wantPlay) playMusic(); } }
   });
