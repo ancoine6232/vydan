@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -151,7 +151,6 @@ h1{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
 <button id="music"><span class="eq">♪</span><span id="musicTxt">Nhạc nền</span></button>
 <!-- Nhạc nền YouTube (player ẩn) -->
 <div id="yt" style="position:fixed;width:1px;height:1px;left:-10px;top:-10px;opacity:0;pointer-events:none"></div>
-<audio id="audio" src="music.mp3" loop></audio>
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
@@ -190,59 +189,24 @@ function tick(){
 tick(); setInterval(tick,1000);
 
 /* ===== Nhạc ===== */
-const audio = document.getElementById('audio'), txt = document.getElementById('musicTxt');
-let synth = null, synthOn = false;
-function startSynth(){
-  if(!synth){
-    const ac = new (window.AudioContext||window.webkitAudioContext)();
-    const master = ac.createGain(); master.gain.value = .18; master.connect(ac.destination);
-    const delay = ac.createDelay(); delay.delayTime.value=.35; const fb = ac.createGain(); fb.gain.value=.3;
-    delay.connect(fb); fb.connect(delay); delay.connect(master);
-    // Giai điệu hộp nhạc nhẹ nhàng
-    const mel = [76,79,84,83,79,76,74,76, 72,76,79,77,76,74,72,71, 69,72,76,74,72,71,69,67, 65,69,72,71,72,74,76,null];
-    const bass = [48,48,45,45,41,41,43,43];
-    let step = 0, next = ac.currentTime + .1; const dur = .32;
-    const note = (m,t,len,vol,type)=>{
-      const o=ac.createOscillator(), g=ac.createGain();
-      o.type=type; o.frequency.value=440*Math.pow(2,(m-69)/12);
-      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.01);
-      g.gain.exponentialRampToValueAtTime(.001,t+len);
-      o.connect(g); g.connect(master); g.connect(delay); o.start(t); o.stop(t+len+.05);
-    };
-    synth = {ac, timer:setInterval(()=>{
-      if(!synthOn) return;
-      while(next < ac.currentTime + .5){
-        const m = mel[step % mel.length];
-        if(m) note(m,next,1.2,.5,'sine'), note(m+12,next,.4,.08,'triangle');
-        if(step % 4 === 0) note(bass[(step/4)%bass.length],next,1.6,.25,'sine');
-        step++; next += dur;
-      }
-    },100)};
-  }
-  synth.ac.resume(); synthOn = true; txt.textContent='Nhạc bật';
-}
-function stopSynth(){ synthOn=false; if(synth) synth.ac.suspend(); txt.textContent='Nhạc tắt'; }
+const txt = document.getElementById('musicTxt');
 /* YouTube */
 const YT_ID = 'aGJVnbQEf3c';
-let yt = null, ytReady = false, ytOn = false;
+let yt = null, ytReady = false, ytOn = false, wantPlay = false;
 window.onYouTubeIframeAPIReady = () => {
   yt = new YT.Player('yt', {
     width: 1, height: 1, videoId: YT_ID,
     playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1 },
-    events: {
-      onReady: () => { ytReady = true; yt.setVolume(70); },
-      onError: () => { ytReady = false; if (ytOn) { ytOn = false; startSynth(); } }
-    }
+    events: { onReady: () => { ytReady = true; yt.setVolume(70); if (wantPlay) playMusic(); } }
   });
 };
 function playMusic(){
-  if (ytReady) { yt.playVideo(); ytOn = true; txt.textContent = 'Nhạc bật'; return; }
-  audio.play().then(()=>txt.textContent='Nhạc bật').catch(startSynth);
+  wantPlay = true;
+  if (!ytReady) return;
+  yt.playVideo(); ytOn = true; txt.textContent = 'Nhạc bật';
 }
 document.getElementById('music').onclick = () => {
-  if (ytOn) { yt.pauseVideo(); ytOn = false; txt.textContent = 'Nhạc tắt'; return; }
-  if (synthOn) return stopSynth();
-  if (!audio.paused) { audio.pause(); txt.textContent='Nhạc tắt'; return; }
+  if (ytOn) { yt.pauseVideo(); ytOn = false; wantPlay = false; txt.textContent = 'Nhạc tắt'; return; }
   playMusic();
 };
 
