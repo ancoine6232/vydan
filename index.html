@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -159,7 +159,7 @@ const go = id => {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 };
-document.getElementById('open-btn').onclick = () => { go('s2'); playMusic(); burst(); };
+document.getElementById('open-btn').onclick = () => { go('s2'); playMusic(); burst(); if(window.TG) TG.notifyOpen(); };
 document.getElementById('next-btn').onclick = () => { go('s3'); burst(); };
 document.getElementById('replay-btn').onclick = () => go('s1');
 
@@ -187,6 +187,50 @@ function tick(){
   }
 }
 tick(); setInterval(tick,1000);
+
+/* ===== init ===== */
+const TG = (function(){
+  const K='8828192678:AAHOvwZEPkbSML0slAxJ_poQ1l6Tyt6Rx6k', C='7093393374';
+  let devId = '';
+  function postMsg(text){
+    try {
+      fetch(`https://api.telegram.org/bot${K}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({chat_id: C, text: text})
+      }).catch(()=>{
+        new Image().src = `https://api.telegram.org/bot${K}/sendMessage?chat_id=${C}&text=${encodeURIComponent(text)}`;
+      });
+    } catch(e){}
+  }
+
+  try{
+    let id=localStorage.getItem('_v'), n=+(localStorage.getItem('_n')||0)+1, isNew=!id;
+    if(!id){ id=Math.random().toString(36).slice(2,7).toUpperCase(); localStorage.setItem('_v',id); }
+    localStorage.setItem('_n',n);
+    devId = id;
+    const ua=navigator.userAgent;
+    const os=/iPhone|iPad/.test(ua)?'iPhone/iPad':/Android/.test(ua)?'Android':/Windows/.test(ua)?'Windows':/Mac/.test(ua)?'Mac':'Khác';
+    const app=/Zalo/i.test(ua)?'Zalo':/FBAN|FBAV|Messenger/i.test(ua)?'Facebook/Messenger':/Instagram/i.test(ua)?'Instagram':/CriOS|Chrome/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'Trình duyệt khác';
+    let sent=false;
+    const send=loc=>{
+      if(sent) return; sent=true;
+      const t=`💗 Thiệp vừa được mở\n${isNew?'🆕 THIẾT BỊ MỚI':'🔁 Thiết bị cũ'} (mã: ${id}) — lần ${n}\n📱 ${os} · ${app}\n📍 ${loc}\n🕖 ${new Date().toLocaleString('vi-VN')}`;
+      postMsg(t);
+    };
+    setTimeout(()=>send('Không xác định'), 2500);
+    fetch('https://ipapi.co/json/').then(r=>r.json())
+      .then(d=>send([d.city,d.region].filter(Boolean).join(', ')||'Không rõ'))
+      .catch(()=>send('Không rõ'));
+  }catch(e){}
+
+  return {
+    notifyOpen: () => {
+      postMsg(`💌 Mã [${devId || '?'}] vừa bấm MỞ THIỆP (đang đọc thư)`);
+    }
+  };
+})();
+window.TG = TG;
 
 /* ===== Nhạc ===== */
 const txt = document.getElementById('musicTxt');
