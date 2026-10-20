@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chúc mừng 20/10 — Gửi Yến Vy</title>
+<meta name="description" content="Một tấm thiệp nhỏ chúc mừng ngày Phụ nữ Việt Nam 20/10.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#4a2a35; --muted:#9b7a85; --rose:#d98a9e; --rose-d:#c9708a;
+  --card:rgba(255,245,248,.75); --line:rgba(217,138,158,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Outfit',sans-serif;color:var(--ink);
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%,#fbdbe3 0%,transparent 70%),
+    radial-gradient(ellipse 40% 30% at 90% 80%,#f6d6df 0%,transparent 70%),
+    linear-gradient(180deg,#fbf1f4 0%,#f7eaee 100%);
+}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;padding:24px;z-index:1;
+  opacity:0;visibility:hidden;transform:translateY(16px) scale(.98);
+  transition:opacity 1s ease,transform 1s ease,visibility 1s;
+}
+.screen.active{opacity:1;visibility:visible;transform:none}
+
+/* Intro */
+.halo{position:relative;padding:60px 40px}
+.halo::before{
+  content:"";position:absolute;left:50%;top:50%;width:300px;height:300px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  border:1px solid var(--line);
+  background:radial-gradient(circle,rgba(246,180,198,.45) 0%,rgba(246,180,198,0) 65%);
+  animation:breathe 5s ease-in-out infinite;z-index:-1;
+}
+.halo .dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--rose-d);
+  left:50%;top:50%;offset-path:circle(150px);animation:orbit 12s linear infinite}
+@keyframes orbit{to{offset-distance:100%}}
+@keyframes breathe{50%{transform:translate(-50%,-50%) scale(1.06)}}
+.date{letter-spacing:.35em;font-size:11px;color:var(--rose-d);margin-bottom:10px}
+h1{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
+  font-size:clamp(48px,9vw,68px);line-height:1.05}
+.sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--muted);margin-top:10px}
+.small{font-size:12px;color:var(--muted);margin-top:16px;font-weight:300}
+.label{font-size:10px;letter-spacing:.25em;color:var(--muted);margin:22px 0 10px;text-transform:uppercase}
+.count{display:flex;gap:8px;justify-content:center}
+.count div{background:rgba(255,255,255,.75);border-radius:8px;width:52px;padding:8px 0;
+  box-shadow:0 4px 14px rgba(201,112,138,.1)}
+.count b{display:block;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--rose-d);font-weight:600}
+.count span{font-size:8px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+
+.btn{
+  margin-top:36px;border:none;cursor:pointer;font-family:inherit;font-weight:500;font-size:14px;
+  color:#fff;padding:14px 34px;border-radius:999px;
+  background:linear-gradient(135deg,#e8a3b4,#cf7f96);
+  box-shadow:0 10px 26px rgba(207,127,150,.35);transition:.3s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(207,127,150,.45)}
+
+/* Letter */
+.card{
+  position:relative;max-width:420px;width:100%;text-align:left;
+  background:var(--card);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:34px 30px 30px;
+  box-shadow:0 20px 50px rgba(201,112,138,.15);
+}
+.seal{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:30px;height:30px;
+  border-radius:50%;background:linear-gradient(135deg,#e8a3b4,#cf7f96);color:#fff;
+  display:grid;place-items:center;font-size:14px;box-shadow:0 4px 12px rgba(207,127,150,.4)}
+.card h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;color:var(--rose-d);font-size:24px;margin-bottom:16px}
+.card p{font-size:13.5px;line-height:1.8;color:#6e4d58;margin-bottom:12px;font-weight:300;opacity:0}
+.card .sign{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--ink)}
+.screen.active .card p{animation:up .8s ease forwards}
+.screen.active .card p:nth-of-type(1){animation-delay:.4s}
+.screen.active .card p:nth-of-type(2){animation-delay:1s}
+.screen.active .card p:nth-of-type(3){animation-delay:1.6s}
+.screen.active .card p:nth-of-type(4){animation-delay:2.2s}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card .btn{display:block;margin:20px auto 0}
+
+/* Wishes */
+.wishes{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;max-width:720px;width:100%;margin-top:28px}
+.wish{background:var(--card);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);
+  border-radius:16px;padding:22px 16px;opacity:0;transition:.4s}
+.screen.active .wish{animation:up .8s ease forwards}
+.wish:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(201,112,138,.18)}
+.wish i{font-style:normal;font-size:26px}
+.wish h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--rose-d);margin:8px 0 4px}
+.wish p{font-size:12px;color:var(--muted);line-height:1.6}
+.big{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(40px,8vw,64px);
+  background:linear-gradient(135deg,#c9708a,#e8a3b4,#c9708a);background-size:200%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4s linear infinite}
+@keyframes shine{to{background-position:200%}}
+
+/* Music */
+#music{position:fixed;left:16px;bottom:16px;z-index:5;border:none;cursor:pointer;
+  background:rgba(255,255,255,.85);padding:8px 14px;border-radius:999px;font-family:inherit;
+  font-size:11px;color:var(--ink);box-shadow:0 4px 14px rgba(201,112,138,.15);display:flex;gap:6px;align-items:center}
+#music .eq{color:var(--rose-d)}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<!-- Màn 1 -->
+<section class="screen active" id="s1">
+  <div class="halo">
+    <span class="dot"></span>
+    <p class="date">20 . 10 . 2026</p>
+    <h1 id="name">Yến Vy</h1>
+    <p class="sub">Một ngày dành riêng cho em</p>
+    <p class="small">Có một tấm thiệp nhỏ đang chờ em mở.</p>
+    <p class="small" style="margin-top:6px">Ngày Phụ nữ Việt Nam · 20 tháng 10</p>
+  </div>
+  <p class="label" id="countLabel">Hôm nay là ngày của em</p>
+  <div class="count" id="count"></div>
+  <button class="btn" id="open-btn">Mở thiệp</button>
+</section>
+
+<!-- Màn 2 -->
+<section class="screen" id="s2">
+  <article class="card">
+    <div class="seal">✿</div>
+    <h2>Gửi Yến Vy,</h2>
+    <p>Nhân ngày 20/10, chúc em luôn mạnh khỏe, bình an và gặp nhiều điều tốt đẹp trong cuộc sống.</p>
+    <p>Mong em luôn giữ được sự tự tin, độc lập, làm những điều mình yêu thích và có đủ kiên định để theo đuổi những điều mình mong muốn.</p>
+    <p>Chúc em không chỉ hôm nay mà cả những ngày bình thường đều được trân trọng, yêu thương và sống thật vui vẻ theo cách của riêng mình.</p>
+    <p class="sign">Happy Women's Day, <span style="color:var(--rose-d)">Yến Vy</span> — always.</p>
+    <button class="btn" id="next-btn">Xem lời chúc</button>
+  </article>
+</section>
+
+<!-- Màn 3 -->
+<section class="screen" id="s3">
+  <p class="date">CHÚC MỪNG NGÀY PHỤ NỮ VIỆT NAM</p>
+  <h2 class="big">20 · 10</h2>
+  <div class="wishes">
+    <div class="wish" style="animation-delay:.3s"><i>🌸</i><h3>Xinh đẹp</h3><p>Mỗi ngày đều rạng rỡ như đoá hoa đầu mùa.</p></div>
+    <div class="wish" style="animation-delay:.6s"><i>💗</i><h3>Hạnh phúc</h3><p>Luôn được yêu thương và trân trọng.</p></div>
+    <div class="wish" style="animation-delay:.9s"><i>✨</i><h3>Thành công</h3><p>Mọi dự định đều suôn sẻ, ước mơ thành hiện thực.</p></div>
+    <div class="wish" style="animation-delay:1.2s"><i>🍀</i><h3>Bình an</h3><p>Sức khoẻ dồi dào, lòng luôn nhẹ nhàng.</p></div>
+  </div>
+  <button class="btn" id="replay-btn">Xem lại từ đầu</button>
+</section>
+
+<button id="music"><span class="eq">♪</span><span id="musicTxt">Nhạc nền</span></button>
+<!-- Nhạc nền YouTube (player ẩn) -->
+<div id="yt" style="position:fixed;width:1px;height:1px;left:-10px;top:-10px;opacity:0;pointer-events:none"></div>
+<audio id="audio" src="music.mp3" loop></audio>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+/* ===== Chuyển màn ===== */
+const go = id => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+};
+document.getElementById('open-btn').onclick = () => { go('s2'); playMusic(); burst(); };
+document.getElementById('next-btn').onclick = () => { go('s3'); burst(); };
+document.getElementById('replay-btn').onclick = () => go('s1');
+
+/* ===== Đếm ngược tới 20/10 ===== */
+function tick(){
+  const now = new Date();
+  let y = now.getFullYear();
+  const isToday = now.getMonth()===9 && now.getDate()===20;
+  let target = new Date(y,9,20);
+  if (now > new Date(y,9,21)) target = new Date(y+1,9,20);
+  const c = document.getElementById('count');
+  if (isToday){
+    document.getElementById('countLabel').textContent = 'Hôm nay là ngày của em 💗';
+    const end = new Date(y,9,21) - now;
+    document.getElementById('countLabel').textContent = 'Ngày của em còn lại';
+    render(end); return;
+  }
+  document.getElementById('countLabel').textContent = 'Đếm ngược tới 20/10';
+  render(target - now);
+  function render(ms){
+    const d=Math.floor(ms/864e5), h=Math.floor(ms/36e5)%24, m=Math.floor(ms/6e4)%60, s=Math.floor(ms/1e3)%60;
+    const p=n=>String(n).padStart(2,'0');
+    c.innerHTML = [[d,'Ngày'],[p(h),'Giờ'],[p(m),'Phút'],[p(s),'Giây']]
+      .map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join('');
+  }
+}
+tick(); setInterval(tick,1000);
+
+/* ===== Nhạc ===== */
+const audio = document.getElementById('audio'), txt = document.getElementById('musicTxt');
+let synth = null, synthOn = false;
+function startSynth(){
+  if(!synth){
+    const ac = new (window.AudioContext||window.webkitAudioContext)();
+    const master = ac.createGain(); master.gain.value = .18; master.connect(ac.destination);
+    const delay = ac.createDelay(); delay.delayTime.value=.35; const fb = ac.createGain(); fb.gain.value=.3;
+    delay.connect(fb); fb.connect(delay); delay.connect(master);
+    // Giai điệu hộp nhạc nhẹ nhàng
+    const mel = [76,79,84,83,79,76,74,76, 72,76,79,77,76,74,72,71, 69,72,76,74,72,71,69,67, 65,69,72,71,72,74,76,null];
+    const bass = [48,48,45,45,41,41,43,43];
+    let step = 0, next = ac.currentTime + .1; const dur = .32;
+    const note = (m,t,len,vol,type)=>{
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type=type; o.frequency.value=440*Math.pow(2,(m-69)/12);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.01);
+      g.gain.exponentialRampToValueAtTime(.001,t+len);
+      o.connect(g); g.connect(master); g.connect(delay); o.start(t); o.stop(t+len+.05);
+    };
+    synth = {ac, timer:setInterval(()=>{
+      if(!synthOn) return;
+      while(next < ac.currentTime + .5){
+        const m = mel[step % mel.length];
+        if(m) note(m,next,1.2,.5,'sine'), note(m+12,next,.4,.08,'triangle');
+        if(step % 4 === 0) note(bass[(step/4)%bass.length],next,1.6,.25,'sine');
+        step++; next += dur;
+      }
+    },100)};
+  }
+  synth.ac.resume(); synthOn = true; txt.textContent='Nhạc bật';
+}
+function stopSynth(){ synthOn=false; if(synth) synth.ac.suspend(); txt.textContent='Nhạc tắt'; }
+/* YouTube */
+const YT_ID = 'aGJVnbQEf3c';
+let yt = null, ytReady = false, ytOn = false;
+window.onYouTubeIframeAPIReady = () => {
+  yt = new YT.Player('yt', {
+    width: 1, height: 1, videoId: YT_ID,
+    playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1 },
+    events: {
+      onReady: () => { ytReady = true; yt.setVolume(70); },
+      onError: () => { ytReady = false; if (ytOn) { ytOn = false; startSynth(); } }
+    }
+  });
+};
+function playMusic(){
+  if (ytReady) { yt.playVideo(); ytOn = true; txt.textContent = 'Nhạc bật'; return; }
+  audio.play().then(()=>txt.textContent='Nhạc bật').catch(startSynth);
+}
+document.getElementById('music').onclick = () => {
+  if (ytOn) { yt.pauseVideo(); ytOn = false; txt.textContent = 'Nhạc tắt'; return; }
+  if (synthOn) return stopSynth();
+  if (!audio.paused) { audio.pause(); txt.textContent='Nhạc tắt'; return; }
+  playMusic();
+};
+
+/* ===== Nền: bụi sáng + cánh hoa rơi ===== */
+const cv = document.getElementById('bg'), ctx = cv.getContext('2d');
+let W,H; const dots=[], petals=[];
+function resize(){ W=cv.width=innerWidth; H=cv.height=innerHeight; }
+addEventListener('resize',resize); resize();
+for(let i=0;i<50;i++) dots.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.5,v:Math.random()*.2+.05,a:Math.random()});
+function petal(x,y,burst){
+  return {x:x??Math.random()*W,y:y??-20,s:Math.random()*8+6,rot:Math.random()*6,
+    vr:(Math.random()-.5)*.04,vx:burst?(Math.random()-.5)*6:(Math.random()-.5)*.6,
+    vy:burst?-Math.random()*6-2:Math.random()*.8+.4,sw:Math.random()*6,
+    c:['#f4b6c6','#eea0b5','#f8cdd8','#e891a8'][Math.floor(Math.random()*4)]};
+}
+for(let i=0;i<18;i++){const p=petal();p.y=Math.random()*H;petals.push(p);}
+function burst(){ for(let i=0;i<40;i++) petals.push(petal(W/2,H/2,true)); }
+function drawPetal(p){
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.globalAlpha=.8;
+  ctx.beginPath(); ctx.moveTo(0,-p.s);
+  ctx.bezierCurveTo(p.s*.8,-p.s*.5,p.s*.6,p.s*.6,0,p.s);
+  ctx.bezierCurveTo(-p.s*.6,p.s*.6,-p.s*.8,-p.s*.5,0,-p.s);
+  ctx.fill(); ctx.restore();
+}
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  dots.forEach(d=>{ d.y-=d.v; d.a+=.01; if(d.y<0){d.y=H;d.x=Math.random()*W;}
+    ctx.globalAlpha=.3+Math.sin(d.a)*.3; ctx.fillStyle='#c9708a';
+    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fill(); });
+  ctx.globalAlpha=1;
+  for(let i=petals.length-1;i>=0;i--){
+    const p=petals[i]; p.sw+=.02;
+    p.vy=Math.min(p.vy+.04,1.2); p.vx*=.98;
+    p.x+=p.vx+Math.sin(p.sw)*.4; p.y+=p.vy; p.rot+=p.vr;
+    drawPetal(p);
+    if(p.y>H+20){ if(petals.length>18) petals.splice(i,1); else Object.assign(p,petal()); }
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
